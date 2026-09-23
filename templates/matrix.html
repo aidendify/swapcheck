@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}Matrix — SwapCheck{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>Approved substitute matrix</h1>
+  <p class="lede">Active rows mark proposed swaps as pre-approved. Office can still deny.</p>
+</div>
+
+<section class="card">
+  <h2>Add row</h2>
+  <form method="post" class="stack">
+    <input type="hidden" name="action" value="create">
+    <div class="row-2">
+      <label>From SKU <input name="from_sku"></label>
+      <label>From name <input name="from_name"></label>
+    </div>
+    <div class="row-2">
+      <label>To SKU <input name="to_sku"></label>
+      <label>To name <input name="to_name"></label>
+    </div>
+    <label>Notes / conditions <input name="notes" placeholder="same tonnage only"></label>
+    <label class="check-row"><input type="checkbox" name="active" value="1" checked> Active</label>
+    <button type="submit" class="btn">Add row</button>
+  </form>
+</section>
+
+<section class="card">
+  <h2>Import / export CSV</h2>
+  <form method="post" enctype="multipart/form-data" class="stack">
+    <input type="hidden" name="action" value="import">
+    <label>CSV file <input type="file" name="file" accept=".csv,text/csv" required></label>
+    <button type="submit" class="btn">Import</button>
+  </form>
+  <p style="margin-top:0.75rem"><a class="btn btn-secondary" href="{{ url_for('matrix_export') }}">Export matrix.csv</a>
+  <span class="muted">Ship sample: sample-matrix.csv</span></p>
+</section>
+
+<section class="card">
+  <h2>Rows</h2>
+  {% if not rows %}
+  <p class="muted">Empty — import sample-matrix.csv to start.</p>
+  {% else %}
+  <table class="table">
+    <thead>
+      <tr><th>From</th><th>To</th><th>Notes</th><th>Active</th><th></th></tr>
+    </thead>
+    <tbody>
+      {% for r in rows %}
+      <tr>
+        <td class="mono">{{ r.from_sku or '—' }} {% if r.from_name %}<span class="muted">{{ r.from_name }}</span>{% endif %}</td>
+        <td class="mono">{{ r.to_sku or '—' }} {% if r.to_name %}<span class="muted">{{ r.to_name }}</span>{% endif %}</td>
+        <td>{{ r.notes or '—' }}</td>
+        <td>{% if r.active %}yes{% else %}no{% endif %}</td>
+        <td>
+          <form method="post" style="display:inline">
+            <input type="hidden" name="action" value="delete">
+            <input type="hidden" name="id" value="{{ r.id }}">
+            <button type="submit" class="btn btn-secondary">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+</section>
+{% endblock %}

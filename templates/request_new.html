@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}New swap — SwapCheck{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>New swap request</h1>
+  <p class="lede">Log the proposed substitute. Matrix hit shows as pre-approved; miss needs office.</p>
+</div>
+
+<section class="card">
+  {% if not techs %}
+  <p class="flash flash-error">Add at least one tech under People (owner) before creating a swap.</p>
+  {% endif %}
+  <form method="post" enctype="multipart/form-data" class="stack">
+    <label>Job ref <input name="job_ref" required value="{{ form.get('job_ref', '') }}" placeholder="JOB-1042 or 12 Oak St"></label>
+    <label>Tech
+      <select name="tech_person_id" required>
+        <option value="">— select —</option>
+        {% for t in techs %}
+        <option value="{{ t.id }}" {% if form.get('tech_person_id')|string == t.id|string %}selected{% endif %}>{{ t.name }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <div class="row-2">
+      <label>From SKU <input name="from_sku" value="{{ form.get('from_sku', '') }}"></label>
+      <label>From name <input name="from_name" value="{{ form.get('from_name', '') }}"></label>
+    </div>
+    <div class="row-2">
+      <label>To SKU <input name="to_sku" value="{{ form.get('to_sku', '') }}"></label>
+      <label>To name <input name="to_name" value="{{ form.get('to_name', '') }}"></label>
+    </div>
+    <label>Reason <input name="reason" value="{{ form.get('reason', '') }}" placeholder="Damaged / wrong SKU / not on truck"></label>
+    <label>Notes <textarea name="notes" rows="2">{{ form.get('notes', '') }}</textarea></label>
+    <label>Spec text <textarea name="spec_text" rows="2" placeholder="µF, amp, model plate transcription">{{ form.get('spec_text', '') }}</textarea></label>
+    <label>Photo (optional, images only)
+      <input type="file" name="photo" accept="image/jpeg,image/png,image/gif,image/webp">
+    </label>
+    <button type="submit" class="btn" {% if not techs %}disabled{% endif %}>Submit swap</button>
+  </form>
+</section>
+{% endblock %}
