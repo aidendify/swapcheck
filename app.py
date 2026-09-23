@@ -183,3 +183,101 @@ def people():
         phone = (request.form.get("phone") or "").strip() or None
         email = (request.form.get("email") or "").strip() or None
         notes = (request.form.get("notes") or "").strip() or None
+        if role not in {"tech", "office"}:
+            flash("Role must be tech or office.", "error")
+            return redirect(url_for("people"))
+        if not name:
+            flash("Name is required.", "error")
+            return redirect(url_for("people"))
+
+        pid_raw = (request.form.get("id") or "").strip()
+        if action == "update" and pid_raw:
+            H.update_person(int(pid_raw), name, role, phone=phone, email=email, notes=notes)
+            flash("Person updated.", "ok")
+        else:
+            H.create_person(name, role, phone=phone, email=email, notes=notes)
+            flash("Person added.", "ok")
+        return redirect(url_for("people"))
+
+    return render_template("people.html", people=H.list_people())
+
+
+@app.route("/matrix", methods=["GET", "POST"])
+def matrix():
+    if request.method == "POST":
+        action = (request.form.get("action") or "create").strip()
+        if action == "delete":
+            rid = int(request.form.get("id") or "0")
+            H.delete_matrix_row(rid)
+            flash("Matrix row removed.", "ok")
+            return redirect(url_for("matrix"))
+
+        if action == "import":
+            f = request.files.get("file")
+            if not f or not f.filename:
+                flash("Choose a CSV file.", "error")
+                return redirect(url_for("matrix"))
+            text = f.read().decode("utf-8-sig", errors="replace")
+            n = H.import_matrix_csv(text)
+            flash(f"Imported {n} matrix row(s).", "ok")
+            return redirect(url_for("matrix"))
+
+        from_sku = (request.form.get("from_sku") or "").strip() or None
+        from_name = (request.form.get("from_name") or "").strip() or None
+        to_sku = (request.form.get("to_sku") or "").strip() or None
+        to_name = (request.form.get("to_name") or "").strip() or None
+        notes = (request.form.get("notes") or "").strip() or None
+        active = request.form.get("active") == "1"
+        if not any([from_sku, from_name, to_sku, to_name]):
+            flash("Need at least one from/to field.", "error")
+            return redirect(url_for("matrix"))
+
+        rid_raw = (request.form.get("id") or "").strip()
+        if action == "update" and rid_raw:
+            H.update_matrix_row(
+                int(rid_raw),
+                from_sku=from_sku,
+                from_name=from_name,
+                to_sku=to_sku,
+                to_name=to_name,
+                notes=notes,
+                active=active,
+            )
+            flash("Matrix row updated.", "ok")
+        else:
+            H.create_matrix_row(
+                from_sku=from_sku,
+                from_name=from_name,
+                to_sku=to_sku,
+                to_name=to_name,
+                notes=notes,
+                active=active,
+            )
+            flash("Matrix row added.", "ok")
+        return redirect(url_for("matrix"))
+
+    return render_template("matrix.html", rows=H.list_matrix())
+
+
+@app.get("/matrix/export.csv")
+def matrix_export():
+    data = H.matrix_csv_bytes()
+    return Response(
+        data,
+        mimetype="text/csv",
+        headers={"Content-Disposition": "attachment; filename=matrix.csv"},
+    )
+
+# Remaining routes live in routes_extra (imported for registration).
+import routes_extra  # noqa: E402,F401
+
+# Ensure schema on import for gunicorn / tests
+try:
+    init_db()
+except Exception:
+    pass
+
+
+if __name__ == "__main__":
+    init_db()
+    app.run(host="0.0.0.0", port=int(__import__("os").environ.get("PORT", "8080")))
