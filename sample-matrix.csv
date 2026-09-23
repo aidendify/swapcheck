@@ -1,0 +1,7 @@
+from_sku,from_name,to_sku,to_name,notes,active
+CAP-45/5,45/5 µF dual run capacitor,CAP-45/5-ALT,45/5 µF dual run (alt brand),same µF and voltage,1
+CAP-40/5,40/5 µF dual run capacitor,CAP-45/5,45/5 µF dual run capacitor,do not upsize — illustrative miss path kept inactive,0
+FIL-16x25x1,16x25x1 MERV-8 filter,FIL-16x25x1-M13,16x25x1 MERV-13 filter,same size only,1
+FIL-20x25x1,20x25x1 MERV-8 filter,FIL-20x25x1-M11,20x25x1 MERV-11 filter,same size only,1
+TXV-3T,3-ton TXV R-410A,TXV-3T-ALT,3-ton TXV R-410A alt,same tonnage and refrigerant,1
+CONT-30A,30A contactor 24V coil,CONT-30A-ALT,30A contactor 24V coil alt,same amp and coil voltage,1
