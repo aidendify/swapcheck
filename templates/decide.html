@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Decide swap — SwapCheck{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>Office decide</h1>
+  <p class="lede">{{ business_name }} · Job {{ req.job_ref }}</p>
+</div>
+
+<section class="card">
+  <p>
+    Status <span class="badge">{{ req.status }}</span>
+    · Matrix {% if req.matrix_hit %}<span class="badge ok">pre-approved</span>{% else %}<span class="badge warn">needs office decision</span>{% endif %}
+  </p>
+  <dl class="kv">
+    <dt>Tech</dt><dd>{{ req.tech_name }}</dd>
+    <dt>From</dt><dd class="mono">{{ req.from_sku or '—' }} {{ req.from_name or '' }}</dd>
+    <dt>To</dt><dd class="mono">{{ req.to_sku or '—' }} {{ req.to_name or '' }}</dd>
+    <dt>Reason</dt><dd>{{ req.reason or '—' }}</dd>
+    <dt>Spec</dt><dd>{{ req.spec_text or '—' }}</dd>
+    <dt>Notes</dt><dd>{{ req.notes or '—' }}</dd>
+  </dl>
+  {% if req.photo_path %}
+  <p><img class="photo" src="{{ url_for('decide_photo', token=token) }}" alt="Swap photo"></p>
+  {% endif %}
+</section>
+
+{% if req.status == 'pending' %}
+<section class="card">
+  <h2>Approve or deny</h2>
+  <form method="post" class="stack" style="margin-bottom:0.75rem">
+    <input type="hidden" name="action" value="approved">
+    <label>Decision note <input name="decision_note"></label>
+    <button type="submit" class="btn">Approve</button>
+  </form>
+  <form method="post" class="stack">
+    <input type="hidden" name="action" value="denied">
+    <label>Decision note <input name="decision_note"></label>
+    <button type="submit" class="btn btn-danger">Deny</button>
+  </form>
+</section>
+{% else %}
+<section class="card">
+  <p>Locked after decision. Decided {{ req.decided_at }} by {{ req.decided_by or '—' }}.
+    {% if req.decision_note %}Note: {{ req.decision_note }}{% endif %}
+  </p>
+</section>
+{% endif %}
+
+<section class="card">
+  <h2>Trail</h2>
+  <ol class="trail">
+    {% for e in events %}
+    <li><span class="mono">{{ e.at }}</span> · <strong>{{ e.kind }}</strong>
+      {% if e.note %} — {{ e.note }}{% endif %}
+    </li>
+    {% endfor %}
+  </ol>
+</section>
+{% endblock %}

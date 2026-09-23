@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}Swap #{{ req.id }} — SwapCheck{% endblock %}
+{% block content %}
+<div class="page-head">
+  <p class="crumb"><a href="{{ url_for('index') if is_owner else url_for('new_request') }}">Back</a>
+    · Job <a href="{{ url_for('job_trail', job_ref=req.job_ref) if is_owner else '#' }}">{{ req.job_ref }}</a></p>
+  <h1>Swap #{{ req.id }}</h1>
+  <p class="lede">
+    Status <span class="badge">{{ req.status }}</span>
+    · Matrix {% if req.matrix_hit %}<span class="badge ok">pre-approved</span>{% else %}<span class="badge warn">needs office decision</span>{% endif %}
+  </p>
+</div>
+
+<section class="card">
+  <h2>Details</h2>
+  <dl class="kv">
+    <dt>Tech</dt><dd>{{ req.tech_name }}</dd>
+    <dt>From</dt><dd class="mono">{{ req.from_sku or '—' }} {{ req.from_name or '' }}</dd>
+    <dt>To</dt><dd class="mono">{{ req.to_sku or '—' }} {{ req.to_name or '' }}</dd>
+    <dt>Reason</dt><dd>{{ req.reason or '—' }}</dd>
+    <dt>Notes</dt><dd>{{ req.notes or '—' }}</dd>
+    <dt>Spec</dt><dd>{{ req.spec_text or '—' }}</dd>
+    <dt>Created</dt><dd class="mono">{{ req.created_at }}</dd>
+    {% if req.decided_at %}
+    <dt>Decided</dt><dd class="mono">{{ req.decided_at }} by {{ req.decided_by or '—' }} — {{ req.decision_note or '' }}</dd>
+    {% endif %}
+  </dl>
+  {% if req.photo_path %}
+  <p><img class="photo" src="{{ url_for('request_photo', request_id=req.id) }}" alt="Swap photo"></p>
+  {% endif %}
+  {% if is_owner %}
+  <p class="muted">Decide link:
+    <span class="mono break">{{ decide_link }}</span>
+    <button type="button" class="btn btn-secondary" onclick='copyText({{ decide_link|tojson }}, this)'>Copy</button>
+  </p>
+  {% endif %}
+</section>
+
+{% if is_owner and req.status == 'pending' %}
+<section class="card">
+  <h2>Decide</h2>
+  <form method="post" action="{{ url_for('approve_request', request_id=req.id) }}" class="stack" style="margin-bottom:0.75rem">
+    <label>Decision note <input name="decision_note" placeholder="Optional"></label>
+    <button type="submit" class="btn">Approve</button>
+  </form>
+  <form method="post" action="{{ url_for('deny_request', request_id=req.id) }}" class="stack" style="margin-bottom:0.75rem">
+    <label>Decision note <input name="decision_note" placeholder="Optional"></label>
+    <button type="submit" class="btn btn-danger">Deny</button>
+  </form>
+  <form method="post" action="{{ url_for('cancel_request', request_id=req.id) }}" class="stack">
+    <label>Decision note <input name="decision_note" placeholder="Optional"></label>
+    <button type="submit" class="btn btn-secondary">Cancel</button>
+  </form>
+</section>
+{% endif %}
+
+<section class="card">
+  <h2>Event trail</h2>
+  <ol class="trail">
+    {% for e in events %}
+    <li><span class="mono">{{ e.at }}</span> · <strong>{{ e.kind }}</strong>
+      {% if e.actor %}<span class="muted"> ({{ e.actor }})</span>{% endif %}
+      {% if e.note %} — {{ e.note }}{% endif %}
+    </li>
+    {% endfor %}
+  </ol>
+</section>
+{% endblock %}
