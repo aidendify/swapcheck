@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}{% if mode == 'tech' %}Tech login{% else %}Owner login{% endif %} — SwapCheck{% endblock %}
+{% block content %}
+<section class="card" style="max-width:420px">
+  <div class="page-head">
+    <h1>{% if mode == 'tech' %}Tech login{% else %}Owner login{% endif %}</h1>
+    <p class="lede">{{ business_name }}</p>
+  </div>
+  {% if error %}<p class="flash flash-error">{{ error }}</p>{% endif %}
+  <form method="post" class="stack">
+    <input type="hidden" name="next" value="{{ next }}">
+    <label>Password
+      <input type="password" name="password" required autofocus>
+    </label>
+    <button type="submit" class="btn">Log in</button>
+  </form>
+  {% if mode == 'tech' %}
+  <p class="muted" style="margin-top:1rem"><a href="{{ url_for('login') }}">Owner login</a></p>
+  {% else %}
+  <p class="muted" style="margin-top:1rem"><a href="{{ url_for('tech_login') }}">Tech login</a></p>
+  {% endif %}
+</section>
+{% endblock %}

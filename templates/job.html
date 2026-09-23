@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Job {{ job_ref }} — SwapCheck{% endblock %}
+{% block content %}
+<div class="page-head">
+  <p class="crumb"><a href="{{ url_for('index') }}">Dashboard</a></p>
+  <h1>Job {{ job_ref }}</h1>
+  <p class="lede">Chronological substitute trail for this job ref.</p>
+</div>
+
+<section class="card">
+  <h2>Requests</h2>
+  {% if not requests %}
+  <p class="muted">No swaps for this job.</p>
+  {% else %}
+  <ul>
+    {% for r in requests %}
+    <li><a href="{{ url_for('request_detail', request_id=r.id) }}">#{{ r.id }}</a>
+      {{ r.from_sku or r.from_name }} → {{ r.to_sku or r.to_name }}
+      · <span class="badge">{{ r.status }}</span>
+      · {{ r.tech_name }}
+    </li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+</section>
+
+<section class="card">
+  <h2>Event trail</h2>
+  <ol class="trail">
+    {% for e in trail %}
+    <li><span class="mono">{{ e.at }}</span> · req #{{ e.request_id }} · <strong>{{ e.kind }}</strong>
+      {% if e.actor %}<span class="muted">({{ e.actor }})</span>{% endif %}
+      {% if e.note %} — {{ e.note }}{% endif %}
+    </li>
+    {% endfor %}
+  </ol>
+</section>
+{% endblock %}

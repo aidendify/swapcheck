@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Settings — SwapCheck{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>Settings</h1>
+  <p class="lede">Runtime config from environment. Edit <span class="mono">.env</span> and restart Compose.</p>
+</div>
+
+<section class="card">
+  <dl class="kv">
+    <dt>Business</dt><dd>{{ business_name }}</dd>
+    <dt>PUBLIC_BASE_URL</dt><dd class="mono">{{ public_base_url or '—' }}</dd>
+    <dt>OFFICE_EMAIL</dt><dd>{{ office_email or '—' }}</dd>
+    <dt>OFFICE_PHONE</dt><dd>{{ office_phone or '—' }}</dd>
+    <dt>SMTP</dt><dd>{% if smtp_configured %}configured{% else %}not configured{% endif %}</dd>
+    <dt>Twilio</dt><dd>{% if twilio_configured %}configured{% else %}not configured{% endif %}</dd>
+    <dt>MAX_UPLOAD_MB</dt><dd>{{ max_upload_mb }}</dd>
+    <dt>UPLOAD_DIR</dt><dd class="mono">{{ upload_dir }}</dd>
+    <dt>DATABASE_PATH</dt><dd class="mono">{{ database_path }}</dd>
+  </dl>
+  <form method="post">
+    <button type="submit" class="btn btn-secondary">Acknowledge</button>
+  </form>
+  <p style="margin-top:1rem">
+    <a class="btn btn-secondary" href="{{ url_for('export_requests') }}">Export requests.csv</a>
+    <a class="btn btn-secondary" href="{{ url_for('export_events') }}">Export events.csv</a>
+  </p>
+</section>
+{% endblock %}
