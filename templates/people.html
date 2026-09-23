@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}People — SwapCheck{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>People</h1>
+  <p class="lede">Techs and office contacts. Start with a few techs — no hard license cap.</p>
+</div>
+
+<section class="card">
+  <h2>Add person</h2>
+  <form method="post" class="stack">
+    <input type="hidden" name="action" value="create">
+    <label>Name <input name="name" required></label>
+    <label>Role
+      <select name="role">
+        <option value="tech">tech</option>
+        <option value="office">office</option>
+      </select>
+    </label>
+    <label>Phone <input name="phone" placeholder="+1…"></label>
+    <label>Email <input name="email" type="email"></label>
+    <label>Notes <input name="notes"></label>
+    <button type="submit" class="btn">Add</button>
+  </form>
+</section>
+
+<section class="card">
+  <h2>Directory</h2>
+  {% if not people %}
+  <p class="muted">No people yet.</p>
+  {% else %}
+  <table class="table">
+    <thead><tr><th>Name</th><th>Role</th><th>Phone</th><th>Email</th><th></th></tr></thead>
+    <tbody>
+      {% for p in people %}
+      <tr>
+        <td>{{ p.name }}</td>
+        <td>{{ p.role }}</td>
+        <td>{{ p.phone or '—' }}</td>
+        <td>{{ p.email or '—' }}</td>
+        <td>
+          <form method="post" style="display:inline" onsubmit="return confirm('Delete {{ p.name }}?');">
+            <input type="hidden" name="action" value="delete">
+            <input type="hidden" name="id" value="{{ p.id }}">
+            <button type="submit" class="btn btn-secondary">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+</section>
+{% endblock %}

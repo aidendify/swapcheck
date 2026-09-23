@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — SwapCheck{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>{{ business_name }}</h1>
+  <p class="lede">Pending substitute decisions and recent outcomes.</p>
+</div>
+
+<section class="card">
+  <h2>Pending</h2>
+  {% if not pending %}
+  <p class="muted">No pending swaps.</p>
+  {% else %}
+  <table class="table">
+    <thead>
+      <tr><th>When</th><th>Job</th><th>Tech</th><th>From → To</th><th>Matrix</th><th></th></tr>
+    </thead>
+    <tbody>
+      {% for r in pending %}
+      <tr>
+        <td class="mono">{{ r.created_at }}</td>
+        <td><a href="{{ url_for('job_trail', job_ref=r.job_ref) }}">{{ r.job_ref }}</a></td>
+        <td>{{ r.tech_name }}</td>
+        <td>{{ r.from_sku or r.from_name }} → {{ r.to_sku or r.to_name }}</td>
+        <td>{% if r.matrix_hit %}<span class="badge ok">pre-approved</span>{% else %}<span class="badge warn">needs office</span>{% endif %}</td>
+        <td><a class="btn btn-secondary" href="{{ url_for('request_detail', request_id=r.id) }}">Open</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+</section>
+
+<section class="card">
+  <h2>Recent decisions</h2>
+  {% if not recent %}
+  <p class="muted">None yet.</p>
+  {% else %}
+  <table class="table">
+    <thead>
+      <tr><th>Decided</th><th>Job</th><th>Status</th><th>From → To</th><th></th></tr>
+    </thead>
+    <tbody>
+      {% for r in recent %}
+      <tr>
+        <td class="mono">{{ r.decided_at or r.created_at }}</td>
+        <td><a href="{{ url_for('job_trail', job_ref=r.job_ref) }}">{{ r.job_ref }}</a></td>
+        <td><span class="badge">{{ r.status }}</span></td>
+        <td>{{ r.from_sku or r.from_name }} → {{ r.to_sku or r.to_name }}</td>
+        <td><a href="{{ url_for('request_detail', request_id=r.id) }}">View</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+</section>
+{% endblock %}
