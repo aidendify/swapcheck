@@ -12,6 +12,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY app.py .
 COPY helpers.py .
+COPY helpers_data.py .
+COPY helpers_extra.py .
+COPY routes_extra.py .
 COPY sample-matrix.csv .
 COPY templates/ templates/
 COPY static/ static/
